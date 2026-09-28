@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mushohabah Santri</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; padding: 16px; }
+    h1 { font-size: 20px; margin-bottom: 16px; color: #1a5276; }
+    .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #555; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 12px; font-family: inherit; }
+    textarea { min-height: 80px; resize: vertical; }
+    button { width: 100%; padding: 12px; background: #1a5276; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    button:active { opacity: 0.8; }
+    .btn-secondary { background: #e0e0e0; color: #333; margin-top: 8px; }
+    .sesi-item { border-bottom: 1px solid #eee; padding: 12px 0; font-size: 13px; line-height: 1.6; }
+    .sesi-item:last-child { border-bottom: none; }
+    .sesi-meta { color: #888; font-size: 11px; }
+    .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+    .status-selesai { background: #d4edda; color: #155724; }
+    .status-followup { background: #fff3cd; color: #856404; }
+    .hidden { display: none; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .nav-tab { flex: 1; text-align: center; padding: 10px; border-radius: 8px; background: #e0e0e0; font-size: 14px; cursor: pointer; font-weight: 600; }
+    .nav-tab.active { background: #1a5276; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <h1>📖 Mushohabah Santri</h1>
+
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showTab('input', event)">Input Sesi</div>
+    <div class="nav-tab" onclick="showTab('riwayat', event)">Riwayat</div>
+  </div>
+
+  <div id="tab-input">
+    <div class="card">
+      <label>Santri</label>
+      <select id="santriSelect"><option value="">-- Pilih --</option></select>
+
+      <label>Tanggal</label>
+      <input type="date" id="tanggal">
+
+      <label>Kategori/Tema</label>
+      <select id="tema">
+        <option value="Adab & Akhlak">Adab & Akhlak</option>
+        <option value="Ibadah">Ibadah</option>
+        <option value="Belajar">Belajar</option>
+        <option value="Sosial & Ukhuwah">Sosial & Ukhuwah</option>
+        <option value="Keluarga">Keluarga</option>
+        <option value="Lainnya">Lainnya</option>
+      </select>
+
+      <label>Kondisi Santri</label>
+      <select id="kondisi">
+        <option value="Tenang">Tenang</option>
+        <option value="Semangat">Semangat</option>
+        <option value="Sedih">Sedih</option>
+        <option value="Cemas">Cemas</option>
+        <option value="Malas">Malas</option>
+        <option value="Bingung">Bingung</option>
+      </select>
+
+      <label>Ringkasan Isi</label>
+      <textarea id="ringkasan" placeholder="Apa yang dibicarakan..."></textarea>
+
+      <label>Tindak Lanjut / Komitmen</label>
+      <textarea id="tindakLanjut" placeholder="Pekan ini santri akan..."></textarea>
+
+      <label>Status</label>
+      <select id="status">
+        <option value="selesai">Selesai</option>
+        <option value="perlu_followup">Perlu Follow-up</option>
+      </select>
+
+      <button onclick="simpanSesi()">💾 Simpan Sesi</button>
+      <button class="btn-secondary" onclick="tambahSantri()">+ Tambah Santri Baru</button>
+    </div>
+  </div>
+
+  <div id="tab-riwayat" class="hidden">
+    <div class="card">
+      <label>Filter Santri</label>
+      <select id="filterSantri" onchange="renderRiwayat()">
+        <option value="">Semua Santri</option>
+      </select>
+    </div>
+    <div class="card" id="riwayatList"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+// ====== GANTI BAGIAN INI DENGAN USERNAME GITHUB ANDA ======
+const GITHUB_USER = 'ulilabshor16g-cmyk
+';
+// =========================================================
+const REPO_NAME = 'mushohabah-santri';
+const DATA_FILE = 'data.json';
+
+let GITHUB_TOKEN = localStorage.getItem('gh_token') || '';
+let cacheData = null;
+let cacheSha = null;
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+async function ghGet() {
+  const url = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${DATA_FILE}?t=${Date.now()}`;
+  const res = await fetch(url, {
+    headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+  });
+  if (!res.ok) throw new Error('Gagal baca data (cek token/username)');
+  const json = await res.json();
+  const clean = json.content.replace(/\n/g, '');
+  const decoded = decodeURIComponent(escape(atob(clean)));
+  cacheSha = json.sha;
+  cacheData = JSON.parse(decoded);
+  return cacheData;
+}
+
+async function ghPut(data) {
+  const url = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${DATA_FILE}`;
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `token ${GITHUB_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: 'Update data mushohabah',
+      content: content,
+      sha: cacheSha
+    })
+  });
+  if (!res.ok) throw new Error('Gagal simpan data');
+  const json = await res.json();
+  cacheSha = json.content.sha;
+}
+
+async function init() {
+  if (!GITHUB_TOKEN) {
+    const token = prompt('Tempel GitHub Personal Access Token (hanya sekali):');
+    if (token) {
+      localStorage.setItem('gh_token', token.trim());
+      GITHUB_TOKEN = token.trim();
+    } else {
+      toast('Token diperlukan untuk pakai web ini');
+      return;
+    }
+  }
+  try {
+    const data = await ghGet();
+    renderSantriSelect(data.santri || []);
+    renderRiwayat(data.sesi || []);
+  } catch (e) {
+    toast('Error: ' + e.message);
+  }
+  document.getElementById('tanggal').valueAsDate = new Date();
+}
+
+function renderSantriSelect(santriList) {
+  const sel = document.getElementById('santriSelect');
+  const filterSel = document.getElementById('filterSantri');
+  sel.innerHTML = '<option value="">-- Pilih --</option>';
+  filterSel.innerHTML = '<option value="">Semua Santri</option>';
+  santriList.forEach(s => {
+    sel.innerHTML += `<option value="${s.nama}">${s.nama}</option>`;
+    filterSel.innerHTML += `<option value="${s.nama}">${s.nama}</option>`;
+  });
+}
+
+async function tambahSantri() {
+  const nama = prompt('Nama santri baru:');
+  if (!nama) return;
+  try {
+    const data = await ghGet();
+    if (!data.santri) data.santri = [];
+    data.santri.push({ nama: nama.trim(), created: new Date().toISOString() });
+    await ghPut(data);
+    renderSantriSelect(data.santri);
+    toast('Santri ditambahkan ✓');
+  } catch (e) {
+    toast('Error: ' + e.message);
+  }
+}
+
+async function simpanSesi() {
+  const santri = document.getElementById('santriSelect').value;
+  const tanggal = document.getElementById('tanggal').value;
+  const tema = document.getElementById('tema').value;
+  const kondisi = document.getElementById('kondisi').value;
+  const ringkasan = document.getElementById('ringkasan').value;
+  const tindakLanjut = document.getElementById('tindakLanjut').value;
+  const status = document.getElementById('status').value;
+
+  if (!santri || !tanggal) { toast('Santri dan tanggal wajib diisi'); return; }
+
+  try {
+    const data = await ghGet();
+    if (!data.sesi) data.sesi = [];
+    data.sesi.push({
+      santri, tanggal, tema, kondisi, ringkasan, tindakLanjut, status,
+      created: new Date().toISOString()
+    });
+    await ghPut(data);
+    toast('Sesi tersimpan ✓');
+    document.getElementById('ringkasan').value = '';
+    document.getElementById('tindakLanjut').value = '';
+    renderRiwayat(data.sesi);
+  } catch (e) {
+    toast('Error: ' + e.message);
+  }
+}
+
+function renderRiwayat(sesiList) {
+  if (!sesiList) sesiList = cacheData?.sesi || [];
+  const filter = document.getElementById('filterSantri')?.value || '';
+  const list = document.getElementById('riwayatList');
+  let filtered = sesiList;
+  if (filter) filtered = sesiList.filter(s => s.santri === filter);
+  filtered = [...filtered].sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
+
+  if (!filtered.length) {
+    list.innerHTML = '<p style="color:#888;text-align:center;">Belum ada sesi.</p>';
+    return;
+  }
+  list.innerHTML = filtered.map(s => `
+    <div class="sesi-item">
+      <strong>${s.santri}</strong> · ${s.tanggal}
+      <span class="status-badge ${s.status === 'selesai' ? 'status-selesai' : 'status-followup'}">
+        ${s.status === 'selesai' ? 'Selesai' : 'Follow-up'}
+      </span>
+      <div class="sesi-meta">${s.tema || ''} · Kondisi: ${s.kondisi || '-'}</div>
+      <div>${s.ringkasan || ''}</div>
+      ${s.tindakLanjut ? `<div class="sesi-meta">→ ${s.tindakLanjut}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+async function showTab(name, ev) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#tab-input, #tab-riwayat').forEach(t => t.classList.add('hidden'));
+  document.getElementById('tab-' + name).classList.remove('hidden');
+  if (ev && ev.target) ev.target.classList.add('active');
+  if (name === 'riwayat') {
+    try {
+      const data = await ghGet();
+      document.getElementById('filterSantri').value = '';
+      renderRiwayat(data.sesi || []);
+    } catch (e) {}
+  }
+}
+
+init();
+</script>
+</body>
+</html>
