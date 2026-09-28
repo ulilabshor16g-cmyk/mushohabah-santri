@@ -1,105 +1,482 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mushohabah Santri</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; padding: 16px; }
-    h1 { font-size: 20px; margin-bottom: 16px; color: #1a5276; }
-    .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #555; }
-    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; margin-bottom: 12px; font-family: inherit; }
-    textarea { min-height: 80px; resize: vertical; }
-    button { width: 100%; padding: 12px; background: #1a5276; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
-    button:active { opacity: 0.8; }
-    .btn-secondary { background: #e0e0e0; color: #333; margin-top: 8px; }
-    .sesi-item { border-bottom: 1px solid #eee; padding: 12px 0; font-size: 13px; line-height: 1.6; }
-    .sesi-item:last-child { border-bottom: none; }
-    .sesi-meta { color: #888; font-size: 11px; }
-    .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
-    .status-selesai { background: #d4edda; color: #155724; }
-    .status-followup { background: #fff3cd; color: #856404; }
-    .hidden { display: none; }
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-    .toast.show { opacity: 1; }
-    .nav-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-    .nav-tab { flex: 1; text-align: center; padding: 10px; border-radius: 8px; background: #e0e0e0; font-size: 14px; cursor: pointer; font-weight: 600; }
-    .nav-tab.active { background: #1a5276; color: #fff; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<title>Mushohabah Santri</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --navy: #0f172a;
+    --navy-soft: #1e293b;
+    --blue: #2563eb;
+    --blue-soft: #dbeafe;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-500: #64748b;
+    --gray-700: #334155;
+    --gray-900: #0f172a;
+    --green: #10b981;
+    --green-soft: #d1fae5;
+    --amber: #f59e0b;
+    --amber-soft: #fef3c7;
+    --red: #ef4444;
+    --radius: 12px;
+    --radius-lg: 16px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    line-height: 1.5;
+    padding-bottom: 40px;
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: var(--navy);
+    color: #fff;
+    padding: 24px 20px 20px;
+    border-bottom: 3px solid var(--blue);
+  }
+  .header-inner { max-width: 720px; margin: 0 auto; }
+  .header-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-title span.icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .header-subtitle {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 6px;
+    padding-left: 46px;
+  }
+
+  /* ===== CONTAINER ===== */
+  .container { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+
+  /* ===== STATS ===== */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: -16px;
+    margin-bottom: 20px;
+  }
+  .stat {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 14px 12px;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+    border: 1px solid var(--gray-200);
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 600;
+  }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display: flex;
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 20px;
+    gap: 4px;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-500);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .tab:hover { color: var(--gray-700); }
+  .tab.active {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+    border: 1px solid var(--gray-200);
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::before {
+    content: '';
+    width: 3px;
+    height: 16px;
+    background: var(--blue);
+    border-radius: 2px;
+  }
+
+  /* ===== FORM ===== */
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    transition: all 0.15s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  textarea {
+    min-height: 80px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.2px;
+  }
+  .btn-primary {
+    background: var(--navy);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--navy-soft); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-secondary {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    margin-top: 8px;
+    border: 1px solid var(--gray-200);
+  }
+  .btn-secondary:hover { background: var(--gray-200); }
+
+  /* ===== SESI LIST ===== */
+  .sesi-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .sesi-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .sesi-item:first-child { padding-top: 0; }
+
+  .sesi-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .sesi-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--navy);
+    flex: 1;
+  }
+  .sesi-date {
+    font-size: 11px;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+
+  .badges { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+  .badge-selesai { background: var(--green-soft); color: #065f46; }
+  .badge-followup { background: var(--amber-soft); color: #92400e; }
+  .badge-tema { background: var(--blue-soft); color: #1e40af; }
+  .badge-kondisi { background: var(--gray-100); color: var(--gray-700); }
+
+  .sesi-body {
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 1.55;
+    padding-left: 46px;
+  }
+  .sesi-tindak {
+    margin-top: 6px;
+    padding: 8px 10px;
+    background: var(--gray-50);
+    border-left: 3px solid var(--blue);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--gray-700);
+    font-style: italic;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--gray-500);
+  }
+  .empty-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+    opacity: 0.4;
+  }
+  .empty-text { font-size: 13px; }
+
+  /* ===== HIDDEN ===== */
+  .hidden { display: none !important; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--navy);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(15,23,42,0.25);
+    transition: transform 0.25s ease, opacity 0.25s;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  /* ===== FADE ANIMATION ===== */
+  .fade-in {
+    animation: fadeIn 0.2s ease-in;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 480px) {
+    .header { padding: 20px 16px 18px; }
+    .header-title { font-size: 19px; }
+    .stat-value { font-size: 20px; }
+    .card { padding: 16px; }
+  }
+</style>
 </head>
 <body>
 
-  <h1>📖 Mushohabah Santri</h1>
-
-  <div class="nav-tabs">
-    <div class="nav-tab active" onclick="showTab('input', event)">Input Sesi</div>
-    <div class="nav-tab" onclick="showTab('riwayat', event)">Riwayat</div>
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-title">
+      <span class="icon">📖</span>
+      Mushohabah Santri
+    </div>
+    <div class="header-subtitle" id="todayDate">Memuat...</div>
   </div>
+</div>
 
-  <div id="tab-input">
-    <div class="card">
-      <label>Santri</label>
-      <select id="santriSelect"><option value="">-- Pilih --</option></select>
+<div class="container">
 
-      <label>Tanggal</label>
-      <input type="date" id="tanggal">
-
-      <label>Kategori/Tema</label>
-      <select id="tema">
-        <option value="Adab & Akhlak">Adab & Akhlak</option>
-        <option value="Ibadah">Ibadah</option>
-        <option value="Belajar">Belajar</option>
-        <option value="Sosial & Ukhuwah">Sosial & Ukhuwah</option>
-        <option value="Keluarga">Keluarga</option>
-        <option value="Lainnya">Lainnya</option>
-      </select>
-
-      <label>Kondisi Santri</label>
-      <select id="kondisi">
-        <option value="Tenang">Tenang</option>
-        <option value="Semangat">Semangat</option>
-        <option value="Sedih">Sedih</option>
-        <option value="Cemas">Cemas</option>
-        <option value="Malas">Malas</option>
-        <option value="Bingung">Bingung</option>
-      </select>
-
-      <label>Ringkasan Isi</label>
-      <textarea id="ringkasan" placeholder="Apa yang dibicarakan..."></textarea>
-
-      <label>Tindak Lanjut / Komitmen</label>
-      <textarea id="tindakLanjut" placeholder="Pekan ini santri akan..."></textarea>
-
-      <label>Status</label>
-      <select id="status">
-        <option value="selesai">Selesai</option>
-        <option value="perlu_followup">Perlu Follow-up</option>
-      </select>
-
-      <button onclick="simpanSesi()">💾 Simpan Sesi</button>
-      <button class="btn-secondary" onclick="tambahSantri()">+ Tambah Santri Baru</button>
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" id="statSantri">0</div>
+      <div class="stat-label">Santri</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="statSesi">0</div>
+      <div class="stat-label">Sesi</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="statFollowup">0</div>
+      <div class="stat-label">Follow-up</div>
     </div>
   </div>
 
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('input', event)">Input Sesi</div>
+    <div class="tab" onclick="showTab('riwayat', event)">Riwayat</div>
+  </div>
+
+  <!-- TAB INPUT -->
+  <div id="tab-input" class="fade-in">
+    <div class="card">
+      <div class="card-title">Catat Sesi Baru</div>
+
+      <div class="field">
+        <label>Santri</label>
+        <select id="santriSelect"><option value="">-- Pilih Santri --</option></select>
+      </div>
+
+      <div class="field">
+        <label>Tanggal</label>
+        <input type="date" id="tanggal">
+      </div>
+
+      <div class="field">
+        <label>Tema / Kategori</label>
+        <select id="tema">
+          <option value="Adab & Akhlak">Adab & Akhlak</option>
+          <option value="Ibadah">Ibadah</option>
+          <option value="Belajar">Belajar</option>
+          <option value="Sosial & Ukhuwah">Sosial & Ukhuwah</option>
+          <option value="Keluarga">Keluarga</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Kondisi Santri</label>
+        <select id="kondisi">
+          <option value="Tenang">Tenang</option>
+          <option value="Semangat">Semangat</option>
+          <option value="Sedih">Sedih</option>
+          <option value="Cemas">Cemas</option>
+          <option value="Malas">Malas</option>
+          <option value="Bingung">Bingung</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Ringkasan Isi</label>
+        <textarea id="ringkasan" placeholder="Apa yang dibicarakan..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Tindak Lanjut / Komitmen</label>
+        <textarea id="tindakLanjut" placeholder="Pekan ini santri akan..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Status</label>
+        <select id="status">
+          <option value="selesai">Selesai</option>
+          <option value="perlu_followup">Perlu Follow-up</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" onclick="simpanSesi()">💾 Simpan Sesi</button>
+      <button class="btn btn-secondary" onclick="tambahSantri()">+ Tambah Santri Baru</button>
+    </div>
+  </div>
+
+  <!-- TAB RIWAYAT -->
   <div id="tab-riwayat" class="hidden">
     <div class="card">
-      <label>Filter Santri</label>
-      <select id="filterSantri" onchange="renderRiwayat()">
-        <option value="">Semua Santri</option>
-      </select>
+      <div class="field" style="margin-bottom:0;">
+        <label>Filter Santri</label>
+        <select id="filterSantri" onchange="renderRiwayat()">
+          <option value="">Semua Santri</option>
+        </select>
+      </div>
     </div>
-    <div class="card" id="riwayatList"></div>
+    <div class="card">
+      <div class="card-title">Riwayat Sesi</div>
+      <div id="riwayatList"></div>
+    </div>
   </div>
 
-  <div class="toast" id="toast"></div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-// ====== GANTI BAGIAN INI DENGAN USERNAME GITHUB ANDA ======
-const GITHUB_USER = 'ulilabshor16g-cmyk
-';
-// =========================================================
+// ====== KONFIGURASI ======
+const GITHUB_USER = 'ulilabshor16g-cmyk';
 const REPO_NAME = 'mushohabah-santri';
 const DATA_FILE = 'data.json';
 
@@ -107,18 +484,35 @@ let GITHUB_TOKEN = localStorage.getItem('gh_token') || '';
 let cacheData = null;
 let cacheSha = null;
 
+// ====== UTIL ======
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
+const AVATAR_COLORS = ['#2563eb','#7c3aed','#db2777','#ea580c','#0891b2','#059669','#dc2626','#ca8a04','#4f46e5','#0d9488'];
+function avatarColor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 1000;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+function initials(name) {
+  const parts = name.trim().split(/\s+/);
+  return (parts[0]?.[0] || '') + (parts[1]?.[0] || parts[0]?.[1] || '');
+}
+function todayID() {
+  const d = new Date();
+  const opts = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+  return d.toLocaleDateString('id-ID', opts);
+}
+
+// ====== GITHUB API ======
 async function ghGet() {
   const url = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${DATA_FILE}?t=${Date.now()}`;
-  const res = await fetch(url, {
-    headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
-  });
+  const res = await fetch(url, { headers: { 'Authorization': `token ${GITHUB_TOKEN}` } });
   if (!res.ok) throw new Error('Gagal baca data (cek token/username)');
   const json = await res.json();
   const clean = json.content.replace(/\n/g, '');
@@ -148,7 +542,11 @@ async function ghPut(data) {
   cacheSha = json.content.sha;
 }
 
+// ====== INIT ======
 async function init() {
+  document.getElementById('todayDate').textContent = todayID();
+  document.getElementById('tanggal').valueAsDate = new Date();
+
   if (!GITHUB_TOKEN) {
     const token = prompt('Tempel GitHub Personal Access Token (hanya sekali):');
     if (token) {
@@ -159,20 +557,27 @@ async function init() {
       return;
     }
   }
+
   try {
     const data = await ghGet();
     renderSantriSelect(data.santri || []);
     renderRiwayat(data.sesi || []);
+    updateStats(data);
   } catch (e) {
     toast('Error: ' + e.message);
   }
-  document.getElementById('tanggal').valueAsDate = new Date();
+}
+
+function updateStats(data) {
+  document.getElementById('statSantri').textContent = (data.santri || []).length;
+  document.getElementById('statSesi').textContent = (data.sesi || []).length;
+  document.getElementById('statFollowup').textContent = (data.sesi || []).filter(s => s.status === 'perlu_followup').length;
 }
 
 function renderSantriSelect(santriList) {
   const sel = document.getElementById('santriSelect');
   const filterSel = document.getElementById('filterSantri');
-  sel.innerHTML = '<option value="">-- Pilih --</option>';
+  sel.innerHTML = '<option value="">-- Pilih Santri --</option>';
   filterSel.innerHTML = '<option value="">Semua Santri</option>';
   santriList.forEach(s => {
     sel.innerHTML += `<option value="${s.nama}">${s.nama}</option>`;
@@ -180,15 +585,17 @@ function renderSantriSelect(santriList) {
   });
 }
 
+// ====== AKSI ======
 async function tambahSantri() {
   const nama = prompt('Nama santri baru:');
-  if (!nama) return;
+  if (!nama || !nama.trim()) return;
   try {
     const data = await ghGet();
     if (!data.santri) data.santri = [];
     data.santri.push({ nama: nama.trim(), created: new Date().toISOString() });
     await ghPut(data);
     renderSantriSelect(data.santri);
+    updateStats(data);
     toast('Santri ditambahkan ✓');
   } catch (e) {
     toast('Error: ' + e.message);
@@ -218,6 +625,7 @@ async function simpanSesi() {
     document.getElementById('ringkasan').value = '';
     document.getElementById('tindakLanjut').value = '';
     renderRiwayat(data.sesi);
+    updateStats(data);
   } catch (e) {
     toast('Error: ' + e.message);
   }
@@ -227,37 +635,60 @@ function renderRiwayat(sesiList) {
   if (!sesiList) sesiList = cacheData?.sesi || [];
   const filter = document.getElementById('filterSantri')?.value || '';
   const list = document.getElementById('riwayatList');
+
   let filtered = sesiList;
   if (filter) filtered = sesiList.filter(s => s.santri === filter);
   filtered = [...filtered].sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
 
   if (!filtered.length) {
-    list.innerHTML = '<p style="color:#888;text-align:center;">Belum ada sesi.</p>';
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">📭</div>
+        <div class="empty-text">Belum ada sesi tercatat</div>
+      </div>`;
     return;
   }
-  list.innerHTML = filtered.map(s => `
-    <div class="sesi-item">
-      <strong>${s.santri}</strong> · ${s.tanggal}
-      <span class="status-badge ${s.status === 'selesai' ? 'status-selesai' : 'status-followup'}">
-        ${s.status === 'selesai' ? 'Selesai' : 'Follow-up'}
-      </span>
-      <div class="sesi-meta">${s.tema || ''} · Kondisi: ${s.kondisi || '-'}</div>
-      <div>${s.ringkasan || ''}</div>
-      ${s.tindakLanjut ? `<div class="sesi-meta">→ ${s.tindakLanjut}</div>` : ''}
-    </div>
-  `).join('');
+
+  list.innerHTML = filtered.map(s => {
+    const col = avatarColor(s.santri || '?');
+    const ini = initials(s.santri || '?');
+    const statusClass = s.status === 'selesai' ? 'badge-selesai' : 'badge-followup';
+    const statusText = s.status === 'selesai' ? 'Selesai' : 'Perlu Follow-up';
+    return `
+      <div class="sesi-item">
+        <div class="sesi-head">
+          <div class="avatar" style="background:${col}">${ini}</div>
+          <div class="sesi-name">${s.santri || '-'}</div>
+          <div class="sesi-date">${s.tanggal || '-'}</div>
+        </div>
+        <div class="badges">
+          <span class="badge ${statusClass}">${statusText}</span>
+          ${s.tema ? `<span class="badge badge-tema">${s.tema}</span>` : ''}
+          ${s.kondisi ? `<span class="badge badge-kondisi">${s.kondisi}</span>` : ''}
+        </div>
+        <div class="sesi-body">
+          ${s.ringkasan || '<em style="color:#94a3b8;">Tidak ada ringkasan</em>'}
+          ${s.tindakLanjut ? `<div class="sesi-tindak">→ ${s.tindakLanjut}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 async function showTab(name, ev) {
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('#tab-input, #tab-riwayat').forEach(t => t.classList.add('hidden'));
-  document.getElementById('tab-' + name).classList.remove('hidden');
+  const target = document.getElementById('tab-' + name);
+  target.classList.remove('hidden');
+  target.classList.add('fade-in');
   if (ev && ev.target) ev.target.classList.add('active');
+
   if (name === 'riwayat') {
     try {
       const data = await ghGet();
       document.getElementById('filterSantri').value = '';
       renderRiwayat(data.sesi || []);
+      updateStats(data);
     } catch (e) {}
   }
 }
